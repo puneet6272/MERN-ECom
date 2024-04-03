@@ -20,6 +20,7 @@ const cartRouter = require('./routes/Cart');
 const ordersRouter = require('./routes/Order');
 const { User } = require('./model/User');
 const { isAuth, sanitizeUser, cookieExtractor } = require('./services/common');
+const path = require('path')
 
 const SECRET_KEY = 'SECRET_KEY';
 // JWT options
@@ -31,7 +32,7 @@ opts.secretOrKey = SECRET_KEY; // TODO: should not be in code;
 
 //middlewares
 
-server.use(express.static('build'))
+server.use(express.static(path.resolve(__dirname,'build')))
 server.use(cookieParser());
 server.use(
   session({
@@ -46,7 +47,7 @@ server.use(
     exposedHeaders: ['X-Total-Count'],
   })
 );
-server.use(express.raw({type: 'application/json'}));
+// server.use(express.raw({type: 'application/json'}));
 server.use(express.json()); // to parse req.body
 server.use('/products', isAuth(), productsRouter.router);
 // we can also use JWT token for client-only auth
@@ -81,7 +82,7 @@ passport.use(
             return done(null, false, { message: 'invalid credentials' });
           }
           const token = jwt.sign(sanitizeUser(user), SECRET_KEY);
-          done(null, {id:user.id, role:user.role}); // this lines sends to serializer
+          done(null, {id:user.id, role:user.role,token}); // this lines sends to serializer
         }
       );
     } catch (err) {
@@ -128,7 +129,7 @@ passport.deserializeUser(function (user, cb) {
 
 
 // This is your test secret API key.
-const stripe = require("stripe")('sk_test_51N5NLVSF2Mo4AGVvozBmb6d5td4kq0lexk43naVyOdmdzLoO4g8LLDsCFc7pT08pUjBesL0G95eP8Xv95kbOaRgU00qrTMpPnY');
+const stripe = require("stripe")('sk_test_51OyvZaSDgDWfg0eUAgX6cSdDkMzv6ijfgtdfPwwXrGndDW0M5RalMC8LmI3hFxOEVJMQg4I21O2MNLDlA3UmJh2L003IE3lQlk');
 
 
 server.post("/create-payment-intent", async (req, res) => {
@@ -152,7 +153,7 @@ server.post("/create-payment-intent", async (req, res) => {
 
 // TODO: we will capture actual order after deploying out server live on public URL
 
-const endpointSecret = "whsec_0e1456a83b60b01b3133d4dbe06afa98f384c2837645c364ee0d5382f6fa3ca2";
+const endpointSecret = "whsec_f246f04bcb15e264ed76c39c8ede8ce5bc5619a5288c0871d0ba3c3b94e8d432";
 
 server.post('/webhook', express.raw({type: 'application/json'}), (request, response) => {
   const sig = request.headers['stripe-signature'];
@@ -178,21 +179,21 @@ server.post('/webhook', express.raw({type: 'application/json'}), (request, respo
       console.log(`Unhandled event type ${event.type}`);
   }
 
-  // Return a 200 response to acknowledge receipt of the event
   response.send();
 });
-
-
 
 
 
 main().catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect('mongodb://127.0.0.1:27017/ecommerce');
+  await mongoose.connect('mongodb+srv://koliarun323:eNHqh6GuQViRfpEI@cluster0.v9zwiki.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0');
   console.log('database connected');
 }
 
 server.listen(8080, () => {
   console.log('server started');
 });
+
+
+

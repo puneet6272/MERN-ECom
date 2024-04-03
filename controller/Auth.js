@@ -40,13 +40,14 @@ exports.createUser = async (req, res) => {
 };
 
 exports.loginUser = async (req, res) => {
+  const user = req.user
   res
     .cookie('jwt', req.user.token, {
       expires: new Date(Date.now() + 3600000),
       httpOnly: true,
     })
     .status(201)
-    .json(req.user.token);
+    .json({id:req.user.id, role:req.user.role});
 };
 
 exports.checkAuth = async (req, res) => {
