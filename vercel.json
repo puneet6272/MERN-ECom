@@ -69,19 +69,18 @@
         {
             "src": "/webhook",
             "dest": "index.js"
-        }, {
+        },
+        {
             "src": "/create-payment-intent",
             "dest": "index.js"
         },
-        
         {
             "src": "/",
             "dest": "build/index.html"
         },
         {
             "src": "/(.+)",
-            "dest": "dist/$1"
+            "dest": "build/$1"
         }
     ]
 }
-
